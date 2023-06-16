@@ -28,7 +28,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='Pega Caminho v0.1.0',
+    name='Pega Caminho v0.2.0',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

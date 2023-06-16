@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QLineEdit,
-    QPushButton
+    QPushButton,
 )
 from PySide6.QtCore import QMimeData
 from PySide6.QtGui import QClipboard
@@ -16,7 +16,7 @@ from PySide6.QtGui import QClipboard
 from gui.droparea import DropArea
 
 
-VERSAO = "0.2.0"
+VERSAO = "0.2.1"
 
 
 class JanelaPrincipal(QMainWindow):
@@ -30,7 +30,7 @@ class JanelaPrincipal(QMainWindow):
         self.widget_central = QWidget()
         self.layout = QVBoxLayout(self.widget_central)
 
-        #Drop area
+        # Drop area
         self.drop_area = DropArea()
         self.drop_area.changed.connect(self.dropou_na_area)
         self.layout.addWidget(self.drop_area)
@@ -54,19 +54,23 @@ class JanelaPrincipal(QMainWindow):
         self.layout.addWidget(self.btn_copiar)
 
         # Sinais
-        # qApp.focusChanged.connect(lambda: self.edit_original.setText(self.clipboard.text()))
-        self.btn_copiar.clicked.connect(lambda: self.clipboard.setText(self.edit_novo.text()))
-        self.edit_original.textChanged.connect(
-            lambda: self.edit_novo.setText(self.atualiza_local(self.edit_original.text()))
-        )
+        self.btn_copiar.clicked.connect(self.copia_caminho)
+        self.edit_original.textChanged.connect(self.atualiza_caminho)
 
         if local:
             self.edit_original.setText(local)
-            self.edit_novo.setText(self.atualiza_local(local))
+            self.edit_novo.setText(self.formata_local(local))
         else:
             self.edit_original.setPlaceholderText("Cole aqui o caminho original...")
-        
+
         self.setCentralWidget(self.widget_central)
+
+    def atualiza_caminho(self) -> None:
+        caminho_novo = self.formata_local(self.edit_original.text())
+        self.edit_novo.setText(caminho_novo)
+
+    def copia_caminho(self) -> None:
+        self.clipboard.setText(self.edit_novo.text())
 
     def dropou_na_area(self, mime_data: QMimeData) -> None:
         if mime_data.hasUrls():
@@ -74,9 +78,8 @@ class JanelaPrincipal(QMainWindow):
         else:
             self.edit_original.setText("Caminho inválido!")
 
-
     @staticmethod
-    def atualiza_local(original: str) -> str:
+    def formata_local(original: str) -> str:
         try:
             caminho = Path(original).as_posix()
             if caminho:
