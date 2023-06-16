@@ -1,9 +1,13 @@
 import sys
+import tomllib
 from pathlib import Path
 
 from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtGui import QClipboard
 from ui_janela import Ui_MainWindow
+
+
+VERSAO = tomllib.load(open("pyproject.toml", "rb"))["tool"]["poetry"]["version"]
 
 
 class JanelaPrincipal(QMainWindow, Ui_MainWindow):
@@ -13,6 +17,7 @@ class JanelaPrincipal(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.clipboard = clipboard
+        self.setWindowTitle(f"Pega Caminho v{VERSAO}")
 
         # Sinais
         qApp.focusChanged.connect(lambda: self.edit_original.setText(self.clipboard.text()))
@@ -35,7 +40,7 @@ class JanelaPrincipal(QMainWindow, Ui_MainWindow):
                 if index != -1:
                     caminho_limpo = caminho[index:]
                     caminho_macos = "smb://fileserver/" + caminho_limpo
-                    return caminho_macos
+                    return caminho_macos.replace(" ", "%20")
         except ValueError:
             pass
         return "Caminho inválido!"
