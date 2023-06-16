@@ -1,27 +1,61 @@
 import sys
-import tomllib
 from pathlib import Path
 
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton
+)
+from PySide6.QtCore import QMimeData
 from PySide6.QtGui import QClipboard
-from ui_janela import Ui_MainWindow
+
+from gui.droparea import DropArea
 
 
-VERSAO = tomllib.load(open("pyproject.toml", "rb"))["tool"]["poetry"]["version"]
+VERSAO = "0.2.0"
 
 
-class JanelaPrincipal(QMainWindow, Ui_MainWindow):
+class JanelaPrincipal(QMainWindow):
     """Janela principal do programa."""
 
     def __init__(self, local: str, clipboard: QClipboard) -> None:
         super().__init__()
-        self.setupUi(self)
-        self.clipboard = clipboard
         self.setWindowTitle(f"Pega Caminho v{VERSAO}")
+        self.clipboard = clipboard
+
+        self.widget_central = QWidget()
+        self.layout = QVBoxLayout(self.widget_central)
+
+        #Drop area
+        self.drop_area = DropArea()
+        self.drop_area.changed.connect(self.dropou_na_area)
+        self.layout.addWidget(self.drop_area)
+
+        # Caminho original
+        self.label_original = QLabel("Caminho original:")
+        self.layout.addWidget(self.label_original)
+
+        self.edit_original = QLineEdit()
+        self.edit_original.setPlaceholderText("Cole aqui o caminho original...")
+        self.layout.addWidget(self.edit_original)
+
+        # Caminho novo
+        self.label_novo = QLabel("Novo caminho:")
+        self.layout.addWidget(self.label_novo)
+        self.edit_novo = QLineEdit()
+        self.layout.addWidget(self.edit_novo)
+
+        # Botão copiar
+        self.btn_copiar = QPushButton(text="Copiar")
+        self.layout.addWidget(self.btn_copiar)
 
         # Sinais
-        qApp.focusChanged.connect(lambda: self.edit_original.setText(self.clipboard.text()))
-        self.pushButton.clicked.connect(lambda: self.clipboard.setText(self.edit_novo.text()))
+        # qApp.focusChanged.connect(lambda: self.edit_original.setText(self.clipboard.text()))
+        self.btn_copiar.clicked.connect(lambda: self.clipboard.setText(self.edit_novo.text()))
         self.edit_original.textChanged.connect(
             lambda: self.edit_novo.setText(self.atualiza_local(self.edit_original.text()))
         )
@@ -31,8 +65,18 @@ class JanelaPrincipal(QMainWindow, Ui_MainWindow):
             self.edit_novo.setText(self.atualiza_local(local))
         else:
             self.edit_original.setPlaceholderText("Cole aqui o caminho original...")
+        
+        self.setCentralWidget(self.widget_central)
 
-    def atualiza_local(self, original: str) -> str:
+    def dropou_na_area(self, mime_data: QMimeData) -> None:
+        if mime_data.hasUrls():
+            self.edit_original.setText(mime_data.urls()[0].path())
+        else:
+            self.edit_original.setText("Caminho inválido!")
+
+
+    @staticmethod
+    def atualiza_local(original: str) -> str:
         try:
             caminho = Path(original).as_posix()
             if caminho:
