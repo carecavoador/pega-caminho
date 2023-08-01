@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from PySide6 import QtWidgets, QtCore, QtGui
+from PySide2 import QtWidgets, QtCore, QtGui
 
 from gui.droparea import DropArea
 
@@ -99,7 +99,7 @@ def main() -> None:
     janela = JanelaPrincipal(local=local, clipboard=app.clipboard())
     janela.show()
 
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
 
 
 if __name__ == "__main__":

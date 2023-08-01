@@ -1,9 +1,9 @@
 # Copyright (C) 2022 The Qt Company Ltd.
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-from PySide6.QtCore import QMimeData, Qt, Slot, Signal
-from PySide6.QtGui import QPalette
-from PySide6.QtWidgets import QFrame, QLabel
+from PySide2.QtCore import QMimeData, Qt, Slot, Signal
+from PySide2.QtGui import QPalette
+from PySide2.QtWidgets import QFrame, QLabel
 
 
 TEXTO_PADRAO = "<Arraste o arquivo ou pasta até aqui>"
