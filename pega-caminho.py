@@ -74,10 +74,10 @@ class JanelaPrincipal(QtWidgets.QMainWindow):
         try:
             caminho = Path(original).as_posix()
             if caminho:
-                index = caminho.lower().find("server-bnu")
+                index = caminho.lower().find("aprovados")
                 if index != -1:
                     caminho_limpo = caminho[index:]
-                    caminho_macos = "smb://fileserver/" + caminho_limpo
+                    caminho_macos = "smb://fileserver/server-bnu/" + caminho_limpo
                     return caminho_macos.replace(" ", "%20")
         except ValueError:
             return "Caminho inválido!"
